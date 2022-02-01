@@ -33,3 +33,32 @@ type service struct {
 	firstReadingSaved bool
 }
 
+func New(sensor *bme280.Device, display *st7735.Device) Service {
+	return &service{
+		sensor:            sensor,
+		display:           display,
+		readingsIndex:     int8(0),
+		readings:          [6]float64{},
+		firstReadingSaved: false,
+	}
+}
+
+func (service *service) ReadData() (temp, press, hum int32, err error) {
+	temp, err = service.sensor.ReadTemperature()
+	if err != nil {
+		return
+	}
+
+	press, err = service.sensor.ReadPressure()
+	if err != nil {
+		return
+	}
+
+	hum, err = service.sensor.ReadHumidity()
+	if err != nil {
+		return
+	}
+
+	return
+}
+
