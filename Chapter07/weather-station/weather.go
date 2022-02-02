@@ -62,3 +62,33 @@ func (service *service) ReadData() (temp, press, hum int32, err error) {
 	return
 }
 
+func (service *service) CheckSensorConnectivity() {
+	for {
+		connected := service.sensor.Connected()
+		if !connected {
+			println("could not detect BME280")
+			time.Sleep(time.Second)
+		}
+
+		println("BME280 detected")
+		break
+	}
+}
+
+func (service *service) DisplayData(temperature, pressure, humidity int32) {
+	println("fill screen")
+	service.display.FillScreen(black)
+
+	tinyfont.WriteLineRotated(service.display, &freemono.Bold9pt7b, 110, 3, "Tiny Weather", white, tinyfont.ROTATION_90)
+
+	temp, press, hum := service.GetFormattedReadings(temperature, pressure, humidity)
+
+	tempString := "Temp:" + temp + "C"
+	tinyfont.WriteLineRotated(service.display, &freemono.Bold9pt7b, 65, 3, tempString, white, tinyfont.ROTATION_90)
+
+	pressString := "P:" + press + "hPa"
+	tinyfont.WriteLineRotated(service.display, &freemono.Bold9pt7b, 45, 3, pressString, white, tinyfont.ROTATION_90)
+
+	humString := "Hum:" + hum + "%"
+	tinyfont.WriteLineRotated(service.display, &freemono.Bold9pt7b, 25, 3, humString, white, tinyfont.ROTATION_90)
+}
