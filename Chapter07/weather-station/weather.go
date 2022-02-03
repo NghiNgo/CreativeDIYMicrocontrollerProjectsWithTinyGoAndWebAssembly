@@ -92,3 +92,27 @@ func (service *service) DisplayData(temperature, pressure, humidity int32) {
 	humString := "Hum:" + hum + "%"
 	tinyfont.WriteLineRotated(service.display, &freemono.Bold9pt7b, 25, 3, humString, white, tinyfont.ROTATION_90)
 }
+
+func (service *service) GetFormattedReadings(temperature, pressure, humidity int32) (temp, press, hum string) {
+	temp = strconv.FormatFloat(float64(temperature/1000), 'f', 2, 64)
+	press = strconv.FormatFloat(float64(pressure/100000), 'f', 2, 64)
+	hum = strconv.FormatFloat(float64(humidity/100), 'f', 2, 64)
+	return
+}
+
+func (service *service) SavePressureReading(pressure float64) {
+	if !service.firstReadingSaved {
+		for i := 0; i < len(service.readings); i++ {
+			service.readings[i] = pressure
+		}
+
+		service.firstReadingSaved = true
+		service.readingsIndex = 0
+
+		return
+	}
+
+	service.readingsIndex++
+	service.readingsIndex = service.readingsIndex % int8(len(service.readings))
+	service.readings[service.readingsIndex] = pressure
+}
