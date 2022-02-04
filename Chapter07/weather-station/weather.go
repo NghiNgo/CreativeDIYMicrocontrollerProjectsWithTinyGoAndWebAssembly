@@ -116,3 +116,20 @@ func (service *service) SavePressureReading(pressure float64) {
 	service.readingsIndex = service.readingsIndex % int8(len(service.readings))
 	service.readings[service.readingsIndex] = pressure
 }
+
+func (service *service) CheckAlert(alertThreshold float64, timeSpan int8) (bool, float64) {
+	currentReading := service.readings[service.readingsIndex]
+
+	comparisonIndex := service.readingsIndex - timeSpan
+	if comparisonIndex < 0 {
+		comparisonIndex = int8(len(service.readings)) - 1
+	}
+
+	println("comparing index:", service.readingsIndex, "with index: ", comparisonIndex)
+
+	comparisonReading := service.readings[comparisonIndex]
+
+	diff := comparisonReading - currentReading
+
+	return diff >= alertThreshold, diff
+}
